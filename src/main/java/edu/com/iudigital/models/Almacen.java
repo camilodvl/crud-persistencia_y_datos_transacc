@@ -61,7 +61,11 @@ public class Almacen {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
             if (resultSet.next()){
-                
+                almacen.setId(Integer.parseInt(resultSet.getString(1)));
+                almacen.setNombreGerente(resultSet.getString(2));
+                almacen.setApellidoGerente(resultSet.getString(3));
+                almacen.setNombreAlmacen(resultSet.getString(4));
+                almacen.setDireccion(resultSet.getString(5));
             }else{
                 System.out.println("No se ha encontrado registros");
             }
@@ -75,22 +79,60 @@ public class Almacen {
         return almacen;
     };
 
-    public void updateAlmacen(int idAlmacen){
+    public void updateAlmacen(Almacen almacen){
         DbConfig dbConnection = new DbConfig("localhost","3306","mercafacil");
 
         Connection connection = dbConnection.connect();
-        String query = String.format("SELECT * FROM almacenes WHERE idalmacenes=%d", idAlmacen);
+        String query = String.format("UPDATE almacenes set " +
+                "nombre_gerente='%s', " +
+                "apellido_gerente='%s', " +
+                "nombre_almacen='%s', " +
+                "direccion='%s' where  idalmacenes=%d ", almacen.getNombreGerente(), almacen.getApellidoGerente(), almacen.getNombreAlmacen(),
+                almacen.getDireccion(), almacen.getId());
         try {
             Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
-            if (resultSet.next()){
-                System.out.println("Se actualizará el almacen '"+resultSet.getString(4)+"' ");
-            }
-            resultSet.close();
+            System.out.println("Actualizando");
+            statement.executeUpdate(query);
             statement.close();
             connection.close();
+            System.out.println("Almacen Actualizado");
         }catch (Exception e){
             System.out.print(e);
         }
     }
+
+    public void deleteAlmacen(int idAlmacen){
+        DbConfig dbConnection = new DbConfig("localhost","3306","mercafacil");
+
+        Connection connection = dbConnection.connect();
+        String query = String.format("DELETE FROM almacenes WHERE idalmacenes=%d",idAlmacen);
+        try {
+            Statement statement = connection.createStatement();
+            statement.execute(query);
+            statement.close();
+            connection.close();
+            System.out.println("Almacen Eliminado");
+        }catch (Exception e){
+            System.out.print(e);
+        }
+    }
+
+    public void createAlmacen(Almacen almacen){
+        DbConfig dbConnection = new DbConfig("localhost","3306","mercafacil");
+
+        Connection connection = dbConnection.connect();
+        String query = String.format("INSERT INTO almacenes (nombre_gerente, apellido_gerente, nombre_almacen, direccion) " +
+                "VALUES ('%s', '%s', '%s', '%s') ",almacen.getNombreGerente(), almacen.getApellidoGerente(), almacen.getNombreAlmacen(), almacen.getDireccion());
+        try {
+            Statement statement = connection.createStatement();
+            statement.execute(query);
+            statement.close();
+            connection.close();
+            System.out.println("Almacen Creado");
+        }catch (Exception e){
+            System.out.print(e);
+        }
+    }
+
+
 }
